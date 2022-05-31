@@ -1,4 +1,5 @@
 import ring_theory.graded_algebra.basic
+import ring_theory.graded_algebra.homogeneous_ideal
 
 namespace graded_algebra
 
@@ -101,7 +102,7 @@ def add_hom_int_to_nat : (⨁ i, nat_to_int 𝓐 i) →+ (⨁ i, 𝓐 i) :=
   map_zero' := by simp only [map_zero],
   map_add' := λ x y, by simp [map_add] }
 
-def equiv : (⨁ i, 𝓐 i) ≃+ (⨁ i, nat_to_int 𝓐 i) :=
+def equiv_nat_to_int : (⨁ i, 𝓐 i) ≃+ (⨁ i, nat_to_int 𝓐 i) :=
 { to_fun := add_hom_nat_to_int 𝓐,
   inv_fun := add_hom_int_to_nat 𝓐,
   left_inv := λ x, begin
@@ -134,20 +135,20 @@ def equiv : (⨁ i, 𝓐 i) ≃+ (⨁ i, nat_to_int 𝓐 i) :=
   end,
   map_add' := λ x y, by simp [map_add] }
 
-def decompose : A →+ ⨁ (i : ℤ), nat_to_int 𝓐 i :=
-(equiv 𝓐).to_add_monoid_hom.comp (graded_algebra.decompose 𝓐).to_add_equiv.to_add_monoid_hom
+def decompose_to_int : A →+ ⨁ (i : ℤ), nat_to_int 𝓐 i :=
+(equiv_nat_to_int 𝓐).to_add_monoid_hom.comp (graded_algebra.decompose 𝓐).to_add_equiv.to_add_monoid_hom
 
-lemma decompose_apply_of_nat (i : ℕ) (a : A) :
-  decompose 𝓐 a (int.of_nat i) = graded_algebra.decompose 𝓐 a i :=
+lemma decompose_to_int_apply_of_nat (i : ℕ) (a : A) :
+  decompose_to_int 𝓐 a (int.of_nat i) = graded_algebra.decompose 𝓐 a i :=
 have m : ∀ x, x ∈ supr 𝓐,
 from λ x, (graded_algebra.is_internal 𝓐).submodule_supr_eq_top.symm ▸ submodule.mem_top,
 begin
   refine submodule.supr_induction 𝓐 (m a) _ _ _,
   { intros j x hj,
-    rw [graded_algebra.decompose_of_mem 𝓐 hj, decompose],
+    rw [graded_algebra.decompose_of_mem 𝓐 hj, decompose_to_int],
     simp only [add_monoid_hom.coe_comp, function.comp_app],
     erw [graded_algebra.decompose_of_mem 𝓐 hj],
-    simp only [equiv, add_hom_nat_to_int, add_monoid_hom.mk_coe],
+    simp only [equiv_nat_to_int, add_hom_nat_to_int, add_monoid_hom.mk_coe],
     erw [direct_sum.to_add_monoid_of],
     by_cases ineq : i = j,
     { subst ineq,
@@ -161,25 +162,25 @@ begin
 end
 
 
-lemma decompose_apply_of_neg_succ_of_nat (i : ℕ) (a : A) :
-  decompose 𝓐 a (int.neg_succ_of_nat i) = 0 := by simp only [eq_iff_true_of_subsingleton]
+lemma decompose_to_int_apply_of_neg_succ_of_nat (i : ℕ) (a : A) :
+  decompose_to_int 𝓐 a (int.neg_succ_of_nat i) = 0 := by simp only [eq_iff_true_of_subsingleton]
 
-lemma decompose_of_aux (a : ⨁ i, 𝓐 i) :
-  decompose 𝓐 (direct_sum.coe_add_monoid_hom 𝓐 a) = add_hom_nat_to_int 𝓐 a :=
+lemma decompose_to_int_of_aux (a : ⨁ i, 𝓐 i) :
+  decompose_to_int 𝓐 (direct_sum.coe_add_monoid_hom 𝓐 a) = add_hom_nat_to_int 𝓐 a :=
 begin
-  apply_fun (equiv 𝓐).symm using (equiv 𝓐).symm.injective,
-  change _ = (equiv 𝓐).symm ((equiv 𝓐) a),
-  simp only [decompose, add_monoid_hom.coe_comp, add_equiv.coe_to_add_monoid_hom, add_equiv.symm_apply_apply],
+  apply_fun (equiv_nat_to_int 𝓐).symm using (equiv_nat_to_int 𝓐).symm.injective,
+  change _ = (equiv_nat_to_int 𝓐).symm ((equiv_nat_to_int 𝓐) a),
+  simp only [decompose_to_int, add_monoid_hom.coe_comp, add_equiv.coe_to_add_monoid_hom, add_equiv.symm_apply_apply],
   convert graded_algebra.left_inv a,
 end
 
-lemma decompose_of_mem (i : ℤ) (a : A) (h : a ∈ nat_to_int 𝓐 i) :
-  decompose 𝓐 a = direct_sum.of (λ i, nat_to_int 𝓐 i) i ⟨a, h⟩ :=
+lemma decompose_to_int_of_mem (i : ℤ) (a : A) (h : a ∈ nat_to_int 𝓐 i) :
+  decompose_to_int 𝓐 a = direct_sum.of (λ i, nat_to_int 𝓐 i) i ⟨a, h⟩ :=
 begin
   have eq1 : (direct_sum.coe_add_monoid_hom 𝓐) (graded_algebra.decompose 𝓐 a) = a := graded_algebra.right_inv a,
-  have : decompose 𝓐 a = decompose 𝓐 ((direct_sum.coe_add_monoid_hom 𝓐) (graded_algebra.decompose 𝓐 a)),
+  have : decompose_to_int 𝓐 a = decompose_to_int 𝓐 ((direct_sum.coe_add_monoid_hom 𝓐) (graded_algebra.decompose 𝓐 a)),
   { rw eq1 },
-  rw [this, decompose_of_aux],
+  rw [this, decompose_to_int_of_aux],
   rw [add_hom_nat_to_int],
   simp only [add_monoid_hom.mk_coe],
   rw direct_sum.coe_add_monoid_hom at eq1,
@@ -198,7 +199,7 @@ begin
     simp only [map_zero], },
 end
 
-lemma left_inverse' : function.left_inverse (nat_to_int.decompose 𝓐) 
+lemma left_inverse' : function.left_inverse (decompose_to_int 𝓐) 
   (direct_sum.coe_add_monoid_hom (nat_to_int 𝓐)) := λ x,
 begin
   induction x using direct_sum.induction_on with i x x y hx hy,
@@ -210,13 +211,13 @@ begin
     { ext1 j,
       by_cases ineq : int.of_nat i = j,
       { subst ineq,
-        erw [decompose_apply_of_nat, graded_algebra.decompose_of_mem 𝓐 x.2, direct_sum.of_eq_same, direct_sum.of_eq_same],
+        erw [decompose_to_int_apply_of_nat, graded_algebra.decompose_of_mem 𝓐 x.2, direct_sum.of_eq_same, direct_sum.of_eq_same],
         ext, 
         refl, },
       { cases j,
         { have ineq2 : i ≠ j,
           { contrapose! ineq, exact ineq },
-          erw [decompose_apply_of_nat, direct_sum.of_eq_of_ne _ _ _ _ ineq],
+          erw [decompose_to_int_apply_of_nat, direct_sum.of_eq_of_ne _ _ _ _ ineq],
           have := graded_algebra.decompose_of_mem_ne 𝓐 x.2 ineq2,
           simpa only [subtype.val_eq_coe, decompose_coe, submodule.coe_eq_zero] using this, },
         { simp only [eq_iff_true_of_subsingleton], }, }, },
@@ -231,27 +232,51 @@ begin
   { rw [map_add, map_add, hx, hy], },
 end
 
-lemma right_inverse' : function.right_inverse (decompose 𝓐) 
+lemma right_inverse' : function.right_inverse (decompose_to_int 𝓐) 
   (direct_sum.coe_add_monoid_hom (nat_to_int 𝓐)) := λ a,
 have m : ∀ x, x ∈ supr (nat_to_int 𝓐), from λ x, by rw [supr_eq_top 𝓐]; trivial,
 begin
   refine submodule.supr_induction (nat_to_int 𝓐) (m a) _ _ _,
   { intros i a hi,
-    rw [decompose_of_mem 𝓐 i a hi, direct_sum.coe_add_monoid_hom_of],
+    rw [decompose_to_int_of_mem 𝓐 i a hi, direct_sum.coe_add_monoid_hom_of],
     refl, },
   { simp [map_zero] },
   { intros x y hx hy,
     rw [map_add, map_add, hx, hy], },
 end
 
-end nat_to_int 
+section 
 
-instance [Π (i : ℕ) (x : 𝓐 i), decidable (x ≠ 0)] : graded_algebra (nat_to_int 𝓐) :=
+variable [Π (i : ℕ) (x : 𝓐 i), decidable (x ≠ 0)]
+
+instance : graded_algebra (nat_to_int 𝓐) :=
 { one_mem := nat_to_int.one_mem' _,
   mul_mem := nat_to_int.mul_mem' _,
-  decompose' := nat_to_int.decompose _,
+  decompose' := nat_to_int.decompose_to_int _,
   left_inv := nat_to_int.left_inverse' _,
   right_inv := nat_to_int.right_inverse' _, }
 
+lemma decompose_eq (a : A) : 
+  graded_algebra.decompose (nat_to_int 𝓐) a = decompose_to_int 𝓐 a := rfl
+
+lemma ideal.is_homogeneous_int_iff_is_homogeneous_nat (I : ideal A) :
+  I.is_homogeneous (nat_to_int 𝓐) ↔ I.is_homogeneous 𝓐 := 
+{ mp := λ hI i a ha, begin
+    specialize hI (int.of_nat i) ha,
+    convert hI,
+    rw [decompose_eq, decompose_to_int_apply_of_nat],
+  end,
+  mpr := λ hI i a ha, begin
+    cases i,
+    { specialize hI i ha,
+      convert hI,
+      rw [decompose_eq, decompose_to_int_apply_of_nat], },
+    { rw [decompose_eq, decompose_to_int_apply_of_neg_succ_of_nat, submodule.coe_zero],
+      exact submodule.zero_mem _, },
+  end }
+
+end
+
+end nat_to_int 
 
 end graded_algebra
