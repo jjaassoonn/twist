@@ -32,7 +32,7 @@ def decompose : M ≃+ ⨁ i, 𝓜 i := add_equiv.symm
   right_inv := graded_module.right_inv,
   map_add' := λ x y, by rw map_add }
 
-instance self : @graded_module ι R A _ _ _ _ _ 𝓐 _ A _ _ (λ i, (𝓐 i).to_add_submonoid) :=
+instance self : graded_module 𝓐 (λ i, (𝓐 i).to_add_submonoid) :=
 { decompose' := graded_algebra.decompose 𝓐,
   left_inv := graded_algebra.left_inv,
   right_inv := graded_algebra.right_inv,
