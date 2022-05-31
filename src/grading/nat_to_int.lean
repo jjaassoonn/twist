@@ -48,7 +48,7 @@ begin
   exact set_like.graded_monoid.one_mem,
 end
 
-lemma mul_mem' ⦃i j : ℤ⦄ {gi gj : A} 
+lemma mul_mem' ⦃i j : ℤ⦄ {gi gj : A}
   (hi : gi ∈ nat_to_int 𝓐 i) (hj : gj ∈ nat_to_int 𝓐 j) :
   gi * gj ∈ nat_to_int 𝓐 (i + j) :=
 begin
@@ -184,7 +184,7 @@ begin
   rw [add_hom_nat_to_int],
   simp only [add_monoid_hom.mk_coe],
   rw direct_sum.coe_add_monoid_hom at eq1,
-  
+
   cases i,
   { change _ ∈ 𝓐 _ at h,
     rw graded_algebra.decompose_of_mem 𝓐 h,
@@ -199,20 +199,20 @@ begin
     simp only [map_zero], },
 end
 
-lemma left_inverse' : function.left_inverse (decompose_to_int 𝓐) 
+lemma left_inverse' : function.left_inverse (decompose_to_int 𝓐)
   (direct_sum.coe_add_monoid_hom (nat_to_int 𝓐)) := λ x,
 begin
   induction x using direct_sum.induction_on with i x x y hx hy,
   { rw [map_zero],
     ext1 i,
     simp only [decompose, function.comp_app, map_zero, direct_sum.zero_apply], },
-  { erw [direct_sum.coe_add_monoid_hom_of], 
+  { erw [direct_sum.coe_add_monoid_hom_of],
     cases i,
     { ext1 j,
       by_cases ineq : int.of_nat i = j,
       { subst ineq,
         erw [decompose_to_int_apply_of_nat, graded_algebra.decompose_of_mem 𝓐 x.2, direct_sum.of_eq_same, direct_sum.of_eq_same],
-        ext, 
+        ext,
         refl, },
       { cases j,
         { have ineq2 : i ≠ j,
@@ -232,7 +232,7 @@ begin
   { rw [map_add, map_add, hx, hy], },
 end
 
-lemma right_inverse' : function.right_inverse (decompose_to_int 𝓐) 
+lemma right_inverse' : function.right_inverse (decompose_to_int 𝓐)
   (direct_sum.coe_add_monoid_hom (nat_to_int 𝓐)) := λ a,
 have m : ∀ x, x ∈ supr (nat_to_int 𝓐), from λ x, by rw [supr_eq_top 𝓐]; trivial,
 begin
@@ -245,7 +245,7 @@ begin
     rw [map_add, map_add, hx, hy], },
 end
 
-section 
+section
 
 variable [Π (i : ℕ) (x : 𝓐 i), decidable (x ≠ 0)]
 
@@ -256,11 +256,11 @@ instance : graded_algebra (nat_to_int 𝓐) :=
   left_inv := nat_to_int.left_inverse' _,
   right_inv := nat_to_int.right_inverse' _, }
 
-lemma decompose_eq (a : A) : 
+lemma decompose_eq (a : A) :
   graded_algebra.decompose (nat_to_int 𝓐) a = decompose_to_int 𝓐 a := rfl
 
 lemma ideal.is_homogeneous_int_iff_is_homogeneous_nat (I : ideal A) :
-  I.is_homogeneous (nat_to_int 𝓐) ↔ I.is_homogeneous 𝓐 := 
+  I.is_homogeneous (nat_to_int 𝓐) ↔ I.is_homogeneous 𝓐 :=
 { mp := λ hI i a ha, begin
     specialize hI (int.of_nat i) ha,
     convert hI,
@@ -277,6 +277,6 @@ lemma ideal.is_homogeneous_int_iff_is_homogeneous_nat (I : ideal A) :
 
 end
 
-end nat_to_int 
+end nat_to_int
 
 end graded_algebra
