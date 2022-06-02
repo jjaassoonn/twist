@@ -15,7 +15,7 @@ Sometimes it is convinient to trade a natrual number graded algebra as an intege
 
 ## Graded modules and twisting
 
-Given a graded ring $A\cong\bigoplus_i A_i$, an $A$-module $M\cong\bigoplus_j M_j$ is said to be graded if $a_i\cdot m_j\in M_{i+j}$ for all $a_i\in A_i$ and $m_j\in M_j$. Given a graded $A$-module $M$, we can twist $M$ by $j$ to give another graded $A$-module where the $i$-th grade component $M'_j$ is defined as $M_{i+j}$. To verify this is a graded module with respect to this new grading, one needs to verify that $M\cong\bigoplus_i M'_i$ and this grading respects scalar multiplication. These are defined in [src/grading/graded_module.lean](src/grading/graded_module.lean).
+Given a graded ring $A\cong\bigoplus_i A_i$, an $A$-module $M\cong\bigoplus_j M_j$ is said to be graded if $a_i\cdot m_j\in M_{i+j}$ for all $a_i\in A_i$ and $m_j\in M_j$. Given a graded $A$-module $M$, we can twist $M$ by $j$ to give another graded $A$-module where the $i$-th grade component $M'_j$ is defined as $M_{i+j}$ . To verify this is a graded module with respect to this new grading, one needs to verify that $M\cong\bigoplus_i M'_i$ and this grading respects scalar multiplication. These are defined in [src/grading/graded_module.lean](src/grading/graded_module.lean).
 
 ## $\tilde{M}$
 
