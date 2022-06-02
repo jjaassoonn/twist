@@ -40,8 +40,6 @@ universes u v
 variables {R : Type u} [comm_semiring R] (M : Type v) [add_comm_monoid M] [module R M]
 variables (S : submonoid R)
 
-example (r : R) (m : M) : M := r • m
-
 /--The equivalence relation on `M × S` where `(m1, s1) ≈ (m2, s2)` if and only if
 for some (u : S), u * (s2 • m1 - s1 • m2) = 0-/
 def r (p1 p2 : M × S) : Prop :=
@@ -178,6 +176,9 @@ instance : has_add (localized_module M S) :=
 lemma mk_add_mk {m1 m2 : M} {s1 s2 : S} :
   mk m1 s1 + mk m2 s2 = mk (s2 • m1 + s1 • m2) (s1 * s2) :=
 mk_eq.mpr $ ⟨1, by dsimp only; rw [one_smul]⟩
+
+lemma mk_zero (s : S) : mk (0 : M) s = 0 :=
+mk_eq.mpr ⟨1, by simp only [smul_zero]⟩
 
 lemma add_assoc' (x y z : localized_module M S) :
   x + y + z = x + (y + z) :=
@@ -354,5 +355,29 @@ instance is_module : module (localization S) (localized_module M S) :=
   zero_smul := zero_smul' }
 
 end
+
+end localized_module
+
+namespace localized_module
+
+universes u v
+
+variables {R : Type u} [comm_semiring R] (M : Type v) [add_comm_group M] [module R M]
+variables (S : submonoid R)
+
+instance : has_neg (localized_module M S) :=
+⟨λ x, localized_module.lift_on x (λ p, mk (-p.1) p.2) $ λ ⟨m, s⟩ ⟨n, t⟩ ⟨u, hu⟩, 
+    mk_eq.mpr ⟨u, by simp only [smul_neg, hu]⟩⟩
+
+lemma neg_mk (m : M) (s : S) : - mk m s = mk (-m) s := rfl
+
+instance : add_comm_group (localized_module M S) :=
+{ neg := λ x, localized_module.lift_on x (λ p, mk (-p.1) p.2) $ λ ⟨m, s⟩ ⟨n, t⟩ ⟨u, hu⟩, 
+    mk_eq.mpr ⟨u, by simp only [smul_neg, hu]⟩,
+  add_left_neg := λ x, begin
+    induction x using localized_module.induction_on with m s,
+    rw [neg_mk, mk_add_mk, smul_neg, add_left_neg, mk_zero],
+  end,
+  ..(_ : add_comm_monoid (localized_module M S))}
 
 end localized_module
