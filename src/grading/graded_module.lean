@@ -213,4 +213,146 @@ from λ x, (direct_sum.is_internal.add_submonoid_supr_eq_top _ (graded_module.is
   right_inv := λ x, add_submonoid.supr_induction 𝓜 (m x) (twisted_by.right_inv.mem 𝓐 𝓜 i) (by simp only [map_zero]) (λ _ _ hx hy, by simp only [map_add, hx, hy]),
   smul_mem := twisted_by.smul_mem' 𝓐 𝓜 i }
 
+instance internal.has_scalar (i : ι) : has_scalar A (⨁ j, twisted_by 𝓜 i j) :=
+{ smul := λ a z, graded_module.decompose 𝓐 (twisted_by 𝓜 i) (a • (graded_module.decompose 𝓐 (twisted_by 𝓜 i)).symm z) }
+
+lemma internal.one_smul (i : ι) (z : ⨁ j, twisted_by 𝓜 i j) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) (1 : A) z = z := 
+begin
+  change graded_module.decompose _ _ _ = _,
+  rw [one_smul, add_equiv.apply_symm_apply],
+end
+
+lemma internal.smul_add (i : ι) (a : A) (x y : ⨁ j, twisted_by 𝓜 i j) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a (x + y) = 
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a x +
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a y := 
+begin
+  change graded_module.decompose _ _ _ = graded_module.decompose _ _ _ + graded_module.decompose _ _ _,
+  simp only [map_add, smul_add],
+end 
+
+lemma internal.smul_zero (i : ι) (a : A) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a 0 = 0 :=
+begin
+  change graded_module.decompose _ _ _ = _,
+  simp only [map_zero, smul_zero],
+end
+
+lemma internal.add_smul (i : ι) (a b : A) (x : ⨁ j, twisted_by 𝓜 i j) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) (a + b) x =
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a x +
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) b x :=
+begin
+  change graded_module.decompose _ _ _ = graded_module.decompose _ _ _ + graded_module.decompose _ _ _,
+  simp only [map_add, add_smul],
+end
+
+lemma internal.zero_smul (i : ι) (x : ⨁ j, twisted_by 𝓜 i j) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) 0 x = 0 :=
+begin
+  change graded_module.decompose _ _ _ = _,
+  simp only [zero_smul, map_zero],
+end
+
+lemma internal.mul_smul_of_of (i : ι) {j j' : ι} {a b : A} (hj : a ∈ 𝓐 j) (hj' : b ∈ 𝓐 j')
+  (x : ⨁ j, twisted_by 𝓜 i j) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) (a * b) x = 
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a 
+    (@has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) b x) := 
+begin
+  change graded_module.decompose _ _ _ = graded_module.decompose _ _ _,
+  unfold has_scalar.smul,
+  rw add_equiv.symm_apply_apply,
+  rw mul_smul,
+end
+
+lemma internal.mul_smul (i : ι) (a b : A) (x : ⨁ j, twisted_by 𝓜 i j) :
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) (a * b) x = 
+  @has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) a 
+    (@has_scalar.smul _ _ (internal.has_scalar 𝓐 𝓜 i) b x) :=
+have m : ∀ x, x ∈ supr 𝓐,
+from λ x, (graded_algebra.is_internal 𝓐).submodule_supr_eq_top.symm ▸ submodule.mem_top,
+begin
+  change graded_module.decompose _ _ _ = graded_module.decompose _ _ _,
+  rw [mul_smul],
+  refine submodule.supr_induction 𝓐 (m a) _ _ _,
+  { intros j a hj,
+    refine submodule.supr_induction 𝓐 (m b) _ _ _,
+    { intros j' b hj',
+      have := internal.mul_smul_of_of 𝓐 𝓜 i hj hj' x,
+      change graded_module.decompose _ _ _ = graded_module.decompose _ _ _ at this,
+      rwa [mul_smul] at this, },
+    { unfold has_scalar.smul,
+      simp only [zero_smul, map_zero, smul_zero], },
+    { unfold has_scalar.smul,
+      intros b c hb hc,
+      simp only [smul_add, add_smul, hb, hc, map_add], }, },
+  { simp only [smul_zero, zero_smul, map_zero], },
+  { intros b c hb hc,
+    simp only [add_smul, smul_add, hb, hc, map_add], }
+end
+
+instance internal.is_module (i : ι) : module A (⨁ j, twisted_by 𝓜 i j) :=
+{ smul := (internal.has_scalar 𝓐 𝓜 i).smul,
+  one_smul := internal.one_smul _ _ _,
+  mul_smul := internal.mul_smul _ _ _,
+  smul_add := internal.smul_add _ _ _,
+  smul_zero := internal.smul_zero _ _ _,
+  add_smul := internal.add_smul _ _ _,
+  zero_smul := internal.zero_smul _ _ _ }
+
+end graded_module
+
+namespace graded_module
+
+open_locale direct_sum
+
+variables {ι R A : Type*}
+variables [decidable_eq ι] [add_monoid ι] [comm_semiring R] [semiring A] [algebra R A]
+variables (𝓐 : ι → submodule R A) [graded_algebra 𝓐]
+variables {M : Type*} [add_comm_group M] [module A M]
+variables (𝓜 : ι → add_subgroup M)
+
+instance (i : ι) : has_neg (⨁ j, twisted_by (λ k, (𝓜 k).to_add_submonoid) i j) :=
+{ neg := direct_sum.to_add_monoid begin
+    intros j,
+    refine { to_fun := _, map_add' := _, map_zero' := _ },
+    { intros x,
+      refine direct_sum.of _ j _,
+      refine ⟨-x.1, _⟩,
+      apply add_subgroup.neg_mem,
+      exact x.2, },
+    { convert map_zero _,
+      rw neg_eq_zero,
+      refl, },
+    { intros x y,
+      rw ←map_add,
+      congr,
+      dsimp only,
+      change -(x.1 + y.1) = _,
+      rw neg_add, },
+  end }
+
+instance is_add_comm_group (i : ι) : add_comm_group (⨁ j, twisted_by (λ k, (𝓜 k).to_add_submonoid) i j) :=
+have aux1 : ∀ (a b c d : ⨁ j, twisted_by (λ k, (𝓜 k).to_add_submonoid) i j), a + b + (c + d) = (a + c) + (b + d), from
+λ a b c d, by { rw [add_assoc, add_assoc], congr' 1, rw [←add_assoc, add_comm b c, add_assoc], },
+{ neg := has_neg.neg,
+  add_left_neg := λ a, begin
+    change (direct_sum.to_add_monoid _) _ + a = 0,
+    induction a using direct_sum.induction_on with k x x y hx hy,
+    { rw [map_zero, zero_add], },
+    { rw [direct_sum.to_add_monoid_of],
+      simp only [add_monoid_hom.coe_mk],
+      generalize_proofs h,
+      rw ←map_add,
+      convert map_zero _,
+      rw [subtype.ext_iff_val],
+      change -x.1 + x.1 = 0,
+      rw add_left_neg, },
+    { simp only [map_add],
+      rw [aux1, hx, hy, add_zero] },
+  end,
+  ..(by apply_instance : add_comm_monoid (⨁ j, twisted_by (λ k, (𝓜 k).to_add_submonoid) i j))}
+
 end graded_module
