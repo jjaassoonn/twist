@@ -1,5 +1,4 @@
 import category_theory.preadditive.injective
-import category_theory.abelian.basic
 import category_theory.adjunction
 import category_theory.limits.constructions.epi_mono
 import category_theory.abelian.exact
@@ -17,7 +16,6 @@ variables {𝓐 𝓑 : Type u} [category.{v} 𝓐] [category.{v} 𝓑]
 variables [abelian 𝓐] [abelian 𝓑]
 variables [enough_injectives 𝓑]
 variables (L : 𝓐 ⥤ 𝓑) (R : 𝓑 ⥤ 𝓐)
--- variables [functor.additive L] [functor.additive R]
 variables [faithful L] [preserves_finite_limits L] [preserves_finite_colimits L]
 variables (adj : L ⊣ R)
 
