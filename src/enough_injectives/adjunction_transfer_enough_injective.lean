@@ -21,13 +21,6 @@ variables (adj : L ⊣ R)
 
 namespace enough_injectives
 
--- instance {X Y : 𝓐} (f : X ⟶ Y) [mono f] : mono (L.map f) := category_theory.preserves_mono L f
--- { right_cancellation := λ B g h cancel, begin
---   type_check g ≫ L.map f,
---   have g' := (adj.hom_equiv _ _).symm g,
-
--- end }
-
 
 section
 
