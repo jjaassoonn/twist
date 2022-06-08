@@ -9,7 +9,7 @@ import linear_algebra.tensor_product
 section
 
 universes v
-variables (R : CommRing.{v})
+variables (R : Ring.{v})
 
 open tensor_product
 open category_theory
