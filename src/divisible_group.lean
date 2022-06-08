@@ -693,4 +693,11 @@ def has_injective_presentation : category_theory.injective_presentation (AddComm
   f := embed_into_injective A,
   mono := (AddCommGroup.mono_iff_injective _).mpr $ embed_into_injective_injective _ }
 
+instance : category_theory.enough_injectives (Ab.{u}) :=
+{ presentation := λ A, nonempty.intro $ begin
+      rcases A with ⟨A, α⟩,
+      resetI,
+      convert has_injective_presentation A,
+  end }
+
 end add_comm_group
