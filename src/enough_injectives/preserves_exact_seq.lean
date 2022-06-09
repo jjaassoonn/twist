@@ -38,7 +38,7 @@ def apply_image_subobject_iso_image_subobject_apply {X Y : 𝓐} (f : X ⟶ Y) :
 { hom := L.map (image_subobject_iso _).hom ≫ (preserve_image L f).inv,
   inv := (preserve_image L f).hom ≫ L.map (image_subobject_iso _).inv,
   hom_inv_id' := by rw [category.assoc, ←category.assoc _ _ (L.map _), iso.inv_hom_id, category.id_comp,
-      ←L.map_comp, iso.hom_inv_id, L.map_id],
+    ←L.map_comp, iso.hom_inv_id, L.map_id],
   inv_hom_id' := by rw [category.assoc, ←category.assoc _ _ (preserve_image L f).inv, 
     ←L.map_comp, iso.inv_hom_id, L.map_id, category.id_comp, iso.hom_inv_id] } 
 ≪≫ (image_subobject_iso _).symm
