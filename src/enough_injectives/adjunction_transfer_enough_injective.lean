@@ -77,10 +77,9 @@ end
 
 lemma injective_object_of_adjunction_is_injective (A : 𝓐) :
   injective (injective_object_of_adjunction L R A) :=
-{ factors := λ X Y g f m, ⟨by resetI; exact injective_object_of_adjunction.factor adj g f, begin
-  resetI,
-  apply injective_object_of_adjunction.comp,
-end⟩ }
+{ factors := λ X Y g f m, 
+  ⟨by resetI; exact injective_object_of_adjunction.factor adj g f, 
+    by apply injective_object_of_adjunction.comp⟩ }
 
 def of_adjunction.presentation.J (A : 𝓐) : 𝓐 := 
 injective_object_of_adjunction L R A

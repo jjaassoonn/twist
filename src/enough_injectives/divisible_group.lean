@@ -7,7 +7,6 @@ import group_theory.subgroup.pointwise
 import group_theory.quotient_group
 import linear_algebra.basis
 import lemmas.add_monoid_hom_mono
-import tactic
 
 namespace add_comm_group
 
@@ -42,15 +41,12 @@ lemma divisible_of_product_divisible : divisible (Π i, B i) :=
         rw h_rep,
         refl, },
       { intros i,
-        have : n • (⊤ : add_subgroup (B i)) = ⊤ := divisible.div n hn,
         have mem1 : x i ∈ n • ⊤,
         { rw divisible.div n hn,
           exact add_subgroup.mem_top _,
           apply_instance, },
         rcases mem1 with ⟨a, -, eq1⟩,
-        refine ⟨a, _⟩,
-        rw ←eq1,
-        refl, },
+        exact ⟨a, eq1 ▸ rfl⟩, },
     end } }
 
 end product
@@ -232,45 +228,6 @@ def embed_into_injective : AddCommGroup.of A ⟶ D :=
   map_zero' := by simpa only [map_zero],
   map_add' := λ x y, by simpa only [map_add] }
 
--- def emb (a : A) : (⟨ulift ℤ⟩ : Module.{u} ℤ) ⟶ ⟨A⟩ := 
--- { to_fun := λ z, z.down • a,
---   map_add' := λ x y, by change (_ + _) • _ = _; rw add_smul,
---   map_smul' := λ x y, by change (x • y.down) • a = _; rw [ring_hom.id_apply, smul_eq_mul, mul_smul] } 
-
--- lemma emb_kernel_eq (a : A) : ∃ (m : ℤ), (emb A a).ker = submodule.span ℤ {ulift.up m} := 
--- sorry
-
--- lemma emb_range_eq (a : A) : (emb A a).range = submodule.span ℤ {a} :=
--- set_like.ext $ λ x, 
--- { mp := λ hx, begin
---     rcases hx with ⟨⟨m⟩, eq1⟩,
---     rw submodule.mem_span_singleton,
---     refine ⟨m, _⟩,
---     exact eq1,
---   end,
---   mpr := λ hx, begin
---     rw submodule.mem_span_singleton at hx,
---     rcases hx with ⟨m, eq1⟩,
---     exact ⟨⟨m⟩, eq1⟩,
---   end }
-
--- def emb_range_equiv (a : A) : Σ (m : ℤ),
---   (⟨submodule.span ℤ {a}⟩ : Module.{u} ℤ) ≅ _ :=
-
--- -- section inj
-
--- -- example (a : A) (h : function.injective (emb _ a)) : true :=
--- -- begin
--- --   have : submodule.is_principal (emb _ a).ker := sorry,
--- --   rcases this with ⟨m, eq1⟩,
--- -- end
-
--- -- end inj
-
--- example (a : A) : sorry := 
--- begin
---   have := linear_map.quot_ker_equiv_range (emb _ a),
--- end
 section
 variable {A}
 
@@ -332,27 +289,20 @@ lemma map_add'
   to_fun (x + y) = to_fun x + to_fun y :=
 begin
   have : (rep x + rep y) • a = rep (x + y) • a,
-  { rw [add_smul, rep_eq, rep_eq, rep_eq],
-    refl, },
+  { rw [add_smul, rep_eq, rep_eq, rep_eq, submodule.coe_add], },
   have := to_fun_wd.aux infinite_order this,
   dunfold to_fun,
   ext1,
   change _ = _ + _,
   dsimp only,
   change _ = quotient.mk' (_ + _),
-  rw quotient_add_group.eq',
-  rw [rat.neg_def, rat.add_def, rat.add_def];
+  rw [quotient_add_group.eq', rat.neg_def, rat.add_def, rat.add_def];
   norm_num,
   simp only [add_mul, mul_assoc],
   norm_num,
-  rw [←add_mul, ←neg_mul, ←add_mul],
-  rw show rat.mk ((-rep (x + y) + (rep x + rep y)) * 4) 8 =
-    rat.mk (-rep (x + y) + (rep x + rep y)) 2,
-  { rw [rat.mk_eq, mul_assoc];
-    norm_num },
-  rw [this, neg_add_eq_sub, sub_self],
-  refine ⟨0, _⟩,
+  rw [←add_mul, ←neg_mul, ←add_mul, this, ←sub_eq_neg_add, sub_self, zero_mul],
   norm_num,
+  exact add_subgroup.zero_mem _,
 end
 
 lemma map_smul'
@@ -361,8 +311,7 @@ lemma map_smul'
   to_fun (m • x) = m • to_fun x :=
 begin
   have : (m * rep x) • a = rep (m • x) • a,
-  { rw [mul_smul, rep_eq x, rep_eq (m • x)],
-    refl, },
+  { rw [mul_smul, rep_eq x, rep_eq (m • x), submodule.coe_smul], },
   have := to_fun_wd.aux infinite_order this,
   dunfold to_fun,
   ext1,
@@ -634,8 +583,6 @@ begin
   exact INEQ,
 end
 
-
-
 end finite_order
 
 lemma embed_into_injective_injective : 
@@ -695,9 +642,9 @@ def has_injective_presentation : category_theory.injective_presentation (AddComm
 
 instance : category_theory.enough_injectives (Ab.{u}) :=
 { presentation := λ A, nonempty.intro $ begin
-      rcases A with ⟨A, α⟩,
-      resetI,
-      convert has_injective_presentation A,
+    rcases A with ⟨A, α⟩,
+    resetI,
+    convert has_injective_presentation A,
   end }
 
 end add_comm_group

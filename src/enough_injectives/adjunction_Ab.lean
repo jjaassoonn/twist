@@ -1,10 +1,7 @@
 import algebra.category.Group.abelian
-import algebra.category.Module.colimits
 import enough_injectives.adjunction_transfer_enough_injective
 import enough_injectives.divisible_group
-import category_theory.adjunction.adjoint_functor_theorems
 import algebra.category.Ring
-import linear_algebra.tensor_product
 
 section
 
@@ -18,7 +15,6 @@ open_locale tensor_product
 namespace coextension
 
 variable (A : Ab.{v})
-
 
 instance : module R ((⟨R⟩ : Ab) ⟶ A) :=
 { smul := λ r f, 
@@ -57,11 +53,7 @@ instance : module R ((⟨R⟩ : Ab) ⟶ A) :=
   end }
 
 @[simp] lemma smul_apply (r : R) (f : (⟨R⟩ : Ab) ⟶ A) (x : R) :
-  (r • f) x = f (x * r) :=
-begin
-  change f _ = _,
-  refl,
-end
+  (r • f) x = f (x * r) := rfl
 
 def map {B C : Ab.{v}} (f : B ⟶ C) :
   (⟨(⟨R⟩ : Ab) ⟶ B⟩ : Module R) ⟶ ⟨(⟨R⟩ : Ab) ⟶ C⟩ :=
@@ -69,14 +61,8 @@ def map {B C : Ab.{v}} (f : B ⟶ C) :
   { to_fun := λ r, f (g r),
     map_zero' := by rw [map_zero, map_zero],
     map_add' := λ x y, by rw [map_add, map_add] },
-  map_add' := λ g1 g2, begin
-    ext1 x,
-    simp only [map_add, add_monoid_hom.add_apply, add_monoid_hom.coe_mk],
-  end,
-  map_smul' := λ r g, begin
-    ext1 x,
-    simp only [add_monoid_hom.coe_mk, ring_hom.id_apply, smul_apply],
-  end }
+  map_add' := λ g1 g2, by ext; simp,
+  map_smul' := λ r g, by ext; simp }
 
 @[simp] lemma map_apply {B C : Ab.{v}} (f : B ⟶ C) 
   (g : (⟨R⟩ : Ab) ⟶ B) (x : R) :
@@ -88,8 +74,7 @@ def functor : Ab.{v} ⥤ Module.{v} R :=
   map := λ X Y g, map R g,
   map_id' := λ X, begin
     ext f x,
-    simp only [Module.id_apply, map_apply],
-    refl,
+    simp only [Module.id_apply, map_apply, id_apply],
   end,
   map_comp' := λ X Y Z g1 g2, begin
     ext f x,
@@ -103,7 +88,6 @@ namespace adj
 variables (M : Module.{v} R) (A : Ab.{v})
 
 namespace hom_equiv
-
 
 def forward (f : (forget₂ (Module.{v} R) Ab.{v}).obj M ⟶ A) :
   M ⟶ (coextension.functor R).obj A :=
@@ -124,25 +108,16 @@ def forward (f : (forget₂ (Module.{v} R) Ab.{v}).obj M ⟶ A) :
 def backward (f : M ⟶ (coextension.functor R).obj A) :
   (forget₂ (Module.{v} R) Ab.{v}).obj M ⟶ A :=
 { to_fun := λ m, (f m).to_fun 1,
-  map_zero' := by simp only [map_zero, add_monoid_hom.to_fun_eq_coe, AddCommGroup.zero_apply],
-  map_add' := λ x y, by simp only [map_add, add_monoid_hom.to_fun_eq_coe, add_monoid_hom.add_apply] }
+  map_zero' := by simp,
+  map_add' := λ x y, by simp }
 
 lemma fb (f : (forget₂ (Module.{v} R) Ab.{v}).obj M ⟶ A) :
   backward R M A (forward R M A f) = f :=
-begin
-  ext,
-  dunfold backward forward,
-  simp only [linear_map.coe_mk, add_monoid_hom.coe_mk, one_smul],
-end
+by ext; simp [backward, forward]
 
 lemma bf (f : M ⟶ (coextension.functor R).obj A) :
   forward R M A (backward R M A f) = f :=
-begin
-  ext,
-  dunfold forward backward,
-  simp only [add_monoid_hom.to_fun_eq_coe, add_monoid_hom.coe_mk, linear_map.map_smulₛₗ, ring_hom.id_apply,
-    coextension.smul_apply, one_mul, add_monoid_hom.mk_coe, linear_map.mk_coe],
-end
+by ext; simp [backward, forward]
 
 end hom_equiv
 
@@ -205,15 +180,9 @@ instance left_adj  : is_left_adjoint (forget₂ (Module.{v} R) Ab.{v}) :=
         linear_map.to_add_monoid_hom_coe, adj.counit_app_apply],
     end } }
 
-open add_comm_group category_theory
-
 instance : category_theory.enough_injectives (Module.{v} R) :=
-@@category_theory.enough_injectives.of_adjunction _ _ _ _ _ _ _ begin
-  haveI h := category_theory.adjunction.left_adjoint_preserves_colimits (left_adj R).adj,
-  have h2 := @h.1,
-  simp only [auto_param_eq] at h2,
-  exact ⟨λ J i1 i2, @h2 J i1⟩,
-end (left_adj R).adj
+have h : _ := (category_theory.adjunction.left_adjoint_preserves_colimits (left_adj R).adj).1,
+@@category_theory.enough_injectives.of_adjunction _ _ _ _ _ _ _  ⟨λ J i1 i2, @h J i1⟩ (left_adj R).adj
 
 
 end
