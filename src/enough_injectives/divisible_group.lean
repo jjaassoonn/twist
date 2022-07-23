@@ -211,6 +211,10 @@ instance [divisible A] : divisible (ulift A) :=
 
 local notation `ℚ⧸ℤ` := (ulift.{u} (ℚ ⧸ ℤ_as_ℚ_subgroup))
 local notation `I` := AddCommGroup.of A ⟶ AddCommGroup.of (ℚ⧸ℤ)
+
+@[reducible] def dummy_function : I → Type u := λ i, ℚ⧸ℤ
+instance : add_comm_group (Π (i : I), ℚ⧸ℤ) := @pi.add_comm_group I (dummy_function A) (λ _ , infer_instance)
+
 local notation `D` := AddCommGroup.of (Π (i : I), ℚ⧸ℤ)
 
 instance : category_theory.injective (⟨ℚ⧸ℤ⟩ : Module ℤ) := 
@@ -636,7 +640,7 @@ end
 
 def has_injective_presentation : category_theory.injective_presentation (AddCommGroup.of.{u} A) :=
 { J := D,
-  injective := injective_of_divisible _ $ divisible_of_product_divisible _,
+  injective := injective_of_divisible _ (by apply divisible_of_product_divisible), 
   f := embed_into_injective A,
   mono := (AddCommGroup.mono_iff_injective _).mpr $ embed_into_injective_injective _ }
 
