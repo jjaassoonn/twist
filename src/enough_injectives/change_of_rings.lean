@@ -31,12 +31,12 @@ def is_module : _root_.module R N := (f ^* N).is_module
 localized "attribute [instance] restriction_of_scalars.is_module" in change_of_rings
 
 
-instance has_scalar' : _root_.has_scalar S (f ^* N) :=
-{ smul := λ s n, @has_scalar.smul S N _ s n }.
+instance has_scalar' : _root_.has_smul S (f ^* N) :=
+{ smul := λ s n, @has_smul.smul S N _ s n }.
 
 @[simp] lemma smul_def' (r : R) (n : f ^* N) : r • n = f r • n := rfl
 @[simp] lemma smul_def (r : R) (n : N) :
-  @has_scalar.smul R N begin
+  @has_smul.smul R N begin
     haveI := is_module f N,
     apply_instance,
   end r n = f r • n := rfl
@@ -193,7 +193,7 @@ end.
 Since `S` has an `R`-module structure, `M ⊗[R] S` can be given an `S`-module structure.
 The scalar multiplication is defined by `s • (m ⊗ s') := m ⊗ (s * s')`
 -/
-@[reducible] def has_scalar_S_M_tensor_S : _root_.has_scalar S (M ⊗[R, f] S) :=
+@[reducible] def has_scalar_S_M_tensor_S : _root_.has_smul S (M ⊗[R, f] S) :=
 { smul := λ s', smul_by f M s' }
 
 local attribute [instance] has_scalar_S_M_tensor_S

@@ -105,7 +105,7 @@ instance (U : (opens Spec.T)ᵒᵖ) (x : U.unop) :
 localized_module.is_module
 
 instance (U : (opens Spec.T)ᵒᵖ) :
-  has_scalar ((Spec.structure_sheaf R).1.obj U) ((MSpec.structure_sheaf M).1.obj U) :=
+  has_smul ((Spec.structure_sheaf R).1.obj U) ((MSpec.structure_sheaf M).1.obj U) :=
 { smul := λ r m, ⟨λ x, (r.1 x) • (m.1 x), λ x, begin
     rcases r.2 x with ⟨Vr, mem1, i1, ρ, s, hr⟩,
     rcases m.2 x with ⟨Vm, mem2, i2, m, t, ht⟩,

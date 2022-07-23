@@ -92,7 +92,7 @@ namespace hom_equiv
 def forward (f : (forget₂ (Module.{v} R) Ab.{v}).obj M ⟶ A) :
   M ⟶ (coextension.functor R).obj A :=
 { to_fun := λ m, 
-  { to_fun := λ r, f (@has_scalar.smul R M _ r m),
+  { to_fun := λ r, f (@has_smul.smul R M _ r m),
     map_zero' := by rw [zero_smul, map_zero],
     map_add' := λ x y, by rw [add_smul, map_add] },
   map_add' := λ x y, begin
@@ -127,7 +127,7 @@ def unit :
   forget₂ (Module ↥R) Ab ⋙ coextension.functor R :=
 { app := λ M, 
   { to_fun := λ m, 
-    { to_fun := λ r, @has_scalar.smul R M _ r m,
+    { to_fun := λ r, @has_smul.smul R M _ r m,
       map_zero' := by rw [zero_smul],
       map_add' := λ x y, by rw [add_smul] },
     map_add' := λ x y, begin
